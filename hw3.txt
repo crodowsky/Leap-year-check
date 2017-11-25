@@ -1,0 +1,91 @@
+#!/bin/sh
+if [ $# -ne 3 ]
+then
+
+cat << HERE
+ERROR: An invaild data was entered.
+Usage: A 3-letter month string (eg. Sep), a day number (eg. 18) and a
+4-digit year (eg. 1996).
+HERE
+exit 3
+fi
+
+MONTH="$1"
+DAY="$2"
+YEAR="$3"
+
+if [ $YEAR -le 1940 ]
+then
+        echo "No year before 1940 accepted"
+        exit 13
+fi
+
+if [ $YEAR -gt $(date +%Y) ]
+then
+        echo "No year after the current year accepted"
+        exit 13
+fi
+
+if [ $((YEAR % 4)) -eq 0 ]
+then
+
+        if [ $((YEAR % 100)) -eq 0 ]
+        then
+                if [ $((YEAR % 400)) -eq 0 ]
+                then
+                        echo "$YEAR was a leap year"
+                        LEAPYEAR=$YEAR
+        else
+                echo "$YEAR was not a leap year."
+        fi
+        else
+        echo "$YEAR was not a leap year."
+        fi
+else
+echo "$YEAR was not a leap year."
+fi
+
+case $MONTH in
+        "Jan") MONTH="1";;
+        "Feb") MONTH="2";;
+        "Mar") MONTH="3";;
+        "Apr") MONTH="4";;
+        "May") MONTH="5";;
+        "Jun") MONTH="6";;
+        "Jul") MONTH="7";;
+        "Aug") MONTH="8";;
+        "Sep") MONTH="9";;
+        "Oct") MONTH="10";;
+        "Nov") MONTH="11";;
+        "Dec") MONTH="12";;
+        *) echo Invalid month entry
+        exit 11;;
+esac
+
+thiryone_days='0[1-9]|[12][0--9]|3[01]'
+thiry_days='0[1-9]|[12][0--9]|30'
+twentyeight_days='0[1-9]1[0-9]|2[0-8]'
+
+case $MONTH in
+        1|3|5|7|8|10|12)
+                [[ $DAY = $thirtyone_days ]];;
+        4|6|9|11)
+                [[ $DAY = $thiry_days ]];;
+        2)
+                [[ $DAY = $twentyeight_days ]] ||
+                        (($LEAPYEAR && $DAY == 29));;
+        *) echo Invaild date
+        exit 12;;
+esac
+
+if [ $YEAR -le 1999 ]
+then
+        y=`expr $YEAR - 1900`
+fi
+if [ $YEAR -ge 2000 ]
+then
+        y=`expr $YEAR - 2000`
+fi
+
+echo "Date entered was $MONTH/$DAY/$y"
+exit 0
